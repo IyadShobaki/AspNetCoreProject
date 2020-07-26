@@ -71,5 +71,11 @@ namespace DataLibrary.Data
             return recs.FirstOrDefault();
 
         }
+
+        public Task<List<OrderModel>> GetOrders()
+        {
+            return _dataAccess.LoadData<OrderModel, dynamic>("dbo.spOrders_All",
+                new { }, _connectionString.SqlConnectionName);
+        }
     }
 }

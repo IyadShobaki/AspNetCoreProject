@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DataLibrary.Data;
-using DataLibrary.Db;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using BlazorServerUI.Data;
+using System.Net.Http;
+using AutoMapper;
+using BlazorServerUI.Models;
 
-namespace ApiApp
+namespace BlazorServerUI
 {
     public class Startup
     {
@@ -25,24 +26,20 @@ namespace ApiApp
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddSingleton(new ConnectionStringData
-            {
-                SqlConnectionName = "Default"
-            });
-            services.AddSingleton<IDataAccess, SqlDb>();
-            services.AddSingleton<IFoodData, FoodData>();
-            services.AddSingleton<IOrderData, OrderData>();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowOrigin", builder => builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader());
-            });
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddSingleton<WeatherForecastService>();
 
-
+            //if (!services.Any(x => x.ServiceType == typeof(HttpClient)))
+            //{
+            //    services.AddSingleton<HttpClient>();
+            //}
+            
+            services.AddSingleton<HttpClient>();
+            services.AddAutoMapper(typeof(OrderProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,18 +49,22 @@ namespace ApiApp
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseCors("AllowOrigin");
-
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }

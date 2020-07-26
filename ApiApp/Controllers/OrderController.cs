@@ -38,6 +38,12 @@ namespace ApiApp.Controllers
             return Ok(new { Id = id });
         }
 
+
+        [HttpGet]
+        public async Task<List<OrderModel>> Get()
+        {
+            return await _orderData.GetOrders();
+        }
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,0 +1,44 @@
+﻿@page "/Food/List"
+
+@inject HttpClient Http;
+
+<h3>List</h3>
+
+@if (foodList is null)
+{
+    <h4>Records Loading...</h4>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var food in foodList)
+            {
+                <tr>
+                    <td>@food.Title</td>
+                    <td>@food.Description</td>
+                    <td>@string.Format("{0:C}", food.Price)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<FoodUIModel> foodList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        foodList = new List<FoodUIModel>();
+        foodList = await Http.GetJsonAsync<List<FoodUIModel>>("https://localhost:44369/api/food");
+        //foodList = foodList.OrderByDescending(f => f.Id).ToList();
+        
+    }
+}
