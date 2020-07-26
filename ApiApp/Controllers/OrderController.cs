@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ApiApp.Models;
 using DataLibrary.Data;
 using DataLibrary.Models;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,59 @@ namespace ApiApp.Controllers
 
             int id = await _orderData.CreateOrder(order);
 
-            return Ok(id);
+            return Ok(new { Id = id });
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+
+            var order = await _orderData.GetOrderById(id);
+
+            if (order != null)
+            {
+                var food = await _foodData.GetFood();
+
+                var output = new
+                {
+                    Order = order,
+                    ItemPurchased = food.Where(x => x.Id == order.FoodId).FirstOrDefault()?.Title
+                };
+
+                return Ok(output);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+        }
+
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Put([FromBody] OrderUpdateModel data)
+        {
+            await _orderData.UpdateOrderName(data.Id, data.OrderName);
+
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _orderData.DeleteOrder(id);
+
+            return Ok();
         }
     }
 }
