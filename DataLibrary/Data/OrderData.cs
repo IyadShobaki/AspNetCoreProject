@@ -26,7 +26,7 @@ namespace DataLibrary.Data
             DynamicParameters p = new DynamicParameters();
 
             p.Add("OrderName", order.OrderName);
-            p.Add("OrderData", order.OrderDate);
+            p.Add("OrderDate", order.OrderDate);
             p.Add("FoodId", order.FoodId);
             p.Add("Quantity", order.Quantity);
             p.Add("Total", order.Total);
