@@ -27,6 +27,7 @@ namespace ApiApp.Controllers
         [ValidateModel]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //public async Task<IActionResult> Post(OrderModel order)
         public async Task<IActionResult> Post(OrderModel order)
         {
             var food = await _foodData.GetFood();
@@ -36,6 +37,7 @@ namespace ApiApp.Controllers
             int id = await _orderData.CreateOrder(order);
 
             return Ok(new { Id = id });
+            
         }
 
 

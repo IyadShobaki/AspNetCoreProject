@@ -87,13 +87,13 @@ else
     private bool recordNotFound = false;
     private OrderUpdateModel updateModel = new OrderUpdateModel();
 
-
+    private const string APIServer = "https://localhost:44369/api/";
 
     protected override async Task OnInitializedAsync()
     {
         order = new OrderUIModel();
 
-        orderData = await Http.GetJsonAsync<List<OrderModel>>("https://localhost:44369/api/order");
+        orderData = await Http.GetJsonAsync<List<OrderModel>>(APIServer + "order");
 
         OrderModel o = orderData.Where(x => x.Id == Id).FirstOrDefault();
 
@@ -101,7 +101,7 @@ else
 
         if (order != null)
         {
-            var food = await Http.GetJsonAsync<List<FoodUIModel>>("https://localhost:44369/api/food");
+            var food = await Http.GetJsonAsync<List<FoodUIModel>>(APIServer + "food");
 
             itemPurchased = food.Where(x => x.Id == order.FoodId)
                                 .FirstOrDefault()?.Title;
@@ -117,14 +117,14 @@ else
 
     private async Task HandleValidSubmit()
     {
-        await Http.PutJsonAsync("https://localhost:44369/api/order", updateModel);
+        await Http.PutJsonAsync(APIServer + "order", updateModel);
         // instead of send it to the databse and return it back
         order.OrderName = updateModel.OrderName;
     }
 
     private async Task HandleDeleteRecord()
     {
-        await Http.DeleteAsync("https://localhost:44369/api/order/"+Id);
+        await Http.DeleteAsync(APIServer + "order/" + Id);
         navigationManager.NavigateTo("food/list");
     }
 }
